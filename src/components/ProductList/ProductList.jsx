@@ -71,10 +71,17 @@ const ProductList = () => {
             totalPrice: getTotalPrice(addedItems),
             queryId,
         };
-        axios.post("http://localhost:8000/web-data", JSON.stringify(data), {
+        // axios.post("http://localhost:8000/web-data", JSON.stringify(data), {
+        //     headers: {
+        //         "Content-Type": "application/json",
+        //     },
+        // });
+        fetch("http://localhost:8000/web-data", {
+            method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
+            body: JSON.stringify(data),
         });
     }, []);
 
