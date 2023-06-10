@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import axios from "axios";
 import useTelegram from "../../hooks/useTelegram";
 import ProductItem from "../ProductItem/ProductItem";
 import "./ProductList.css";
@@ -62,7 +63,28 @@ const getTotalPrice = (items) => {
 
 const ProductList = () => {
     const [addedItems, setAddedItems] = useState([]);
-    const { tg } = useTelegram();
+    const { tg, queryId } = useTelegram();
+
+    const onSendData = useCallback(() => {
+        const data = {
+            products: addedItems,
+            totalPrice: getTotalPrice(addedItems),
+            queryId,
+        };
+        axios.post("http://localhost:8000", data, {
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+    }, []);
+
+    useEffect(() => {
+        tg.onEvent("mainButtonClicked", onSendData);
+        return () => {
+            tg.offEvent("mainButtonClicked", onSendData);
+        };
+    }, [onSendData]);
+
     const onAdd = (product) => {
         const alreadyAdded = addedItems.find((item) => item.id === product.id);
         let newItems = [];
